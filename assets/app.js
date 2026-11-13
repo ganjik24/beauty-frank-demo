@@ -1,9 +1,7 @@
 const appScriptUrl = new URL(document.currentScript.src);
 const projectRootUrl = new URL("../", appScriptUrl);
-const openedAsFile = location.protocol === "file:";
 
 function siteHref(path) {
-  if (!openedAsFile) return path;
   const [pathAndQuery, hash = ""] = path.split("#");
   const [pathname, query = ""] = pathAndQuery.split("?");
   const clean = pathname.replace(/^\/+|\/+$/g, "");
@@ -15,14 +13,15 @@ function siteHref(path) {
 }
 
 function assetHref(path) {
-  return openedAsFile ? new URL(path.replace(/^\//, ""), projectRootUrl).href : path;
+  return new URL(path.replace(/^\/+/, ""), projectRootUrl).href;
 }
 
 const rootPath = decodeURIComponent(projectRootUrl.pathname);
 const pagePath = decodeURIComponent(location.pathname);
-const currentPath = openedAsFile
-  ? `/${pagePath.slice(rootPath.length).replace(/index\.html$/, "")}`
-  : location.pathname.replace(/index\.html$/, "");
+const relativePagePath = pagePath.startsWith(rootPath)
+  ? pagePath.slice(rootPath.length)
+  : pagePath.replace(/^\/+/, "");
+const currentPath = `/${relativePagePath.replace(/index\.html$/, "")}`;
 
 const navItems = [
   ["/about/", "Об агентстве"],
