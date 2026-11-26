@@ -3,26 +3,25 @@ const projectRootUrl = new URL("../", appScriptUrl);
 const openedAsFile = location.protocol === "file:";
 
 function siteHref(path) {
-  if (!openedAsFile) return path;
   const [pathAndQuery, hash = ""] = path.split("#");
   const [pathname, query = ""] = pathAndQuery.split("?");
   const clean = pathname.replace(/^\/+|\/+$/g, "");
-  const localPath = clean ? `${clean}/index.html` : "index.html";
-  const url = new URL(localPath, projectRootUrl);
+  const projectPath = openedAsFile
+    ? (clean ? `${clean}/index.html` : "index.html")
+    : (clean ? `${clean}/` : "");
+  const url = new URL(projectPath, projectRootUrl);
   if (query) url.search = query;
   if (hash) url.hash = hash;
   return url.href;
 }
 
 function assetHref(path) {
-  return openedAsFile ? new URL(path.replace(/^\//, ""), projectRootUrl).href : path;
+  return new URL(path.replace(/^\//, ""), projectRootUrl).href;
 }
 
 const rootPath = decodeURIComponent(projectRootUrl.pathname);
 const pagePath = decodeURIComponent(location.pathname);
-const currentPath = openedAsFile
-  ? `/${pagePath.slice(rootPath.length).replace(/index\.html$/, "")}`
-  : location.pathname.replace(/index\.html$/, "");
+const currentPath = `/${pagePath.slice(rootPath.length).replace(/index\.html$/, "")}`;
 
 const navItems = [
   ["/about/", "Об агентстве"],
@@ -47,7 +46,7 @@ function renderShell() {
       <header class="site-header">
         <div class="header-inner">
           <a class="brand" href="${siteHref("/")}" aria-label="BEAUTY FRANK — главная">
-            <img src="${assetHref("/public/media/branding/bf-monogram-transparent-v2.png")}" alt="" width="52" height="52">
+            <img src="${assetHref("/public/media/branding/bf-crest.png")}" alt="" width="52" height="52">
             <span class="brand-copy"><span class="brand-name">BEAUTY FRANK</span><span class="brand-sub">Image • Beauty • Personal Brand</span></span>
           </a>
           <nav class="main-nav" id="main-navigation" aria-label="Основная навигация">
@@ -63,7 +62,7 @@ function renderShell() {
       <footer class="site-footer">
         <div class="container">
           <div class="footer-grid">
-            <div class="footer-identity"><img class="footer-lockup" src="${assetHref("/public/media/branding/beauty-frank-lockup-transparent-v2.png")}" alt="BEAUTY FRANK — имиджевое агентство"><p class="footer-tagline">Имиджевое агентство полного цикла в Красноярске. Эстетика, которая говорит без слов.</p></div>
+            <div><div class="footer-brand">BEAUTY FRANK</div><p class="footer-tagline">Имиджевое агентство полного цикла в Красноярске. Эстетика, которая говорит без слов.</p></div>
             <div class="footer-col"><h3>Разделы</h3><a href="${siteHref("/about/")}">Об агентстве</a><a href="${siteHref("/services/")}">Услуги</a><a href="${siteHref("/portfolio/")}">Портфолио</a><a href="${siteHref("/education/")}">Обучение</a></div>
             <div class="footer-col"><h3>Связь</h3><a href="${siteHref("/contacts/")}">Оставить заявку</a><a href="https://www.instagram.com/beauty_frank_/" target="_blank" rel="noopener noreferrer">Instagram*</a><a href="${siteHref("/privacy/")}">Политика конфиденциальности</a><a href="${siteHref("/consent/")}">Согласие на обработку данных</a></div>
           </div>
